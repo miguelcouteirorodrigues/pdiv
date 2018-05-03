@@ -10,6 +10,8 @@ class Engine {
         var pause = false;
         var startMusic = true;
         var playMusic = true;
+
+        var palmTreePositions = [];
         
         var bgMusic;
         var pauseMusic;
@@ -21,16 +23,6 @@ class Engine {
 
         var skidLeft;
         var skidRight;
-
-        this.renderCountdown = function(context, fontData, text) {
-            context.save();
-            context.fillStyle = "#ffffff";
-            context.font = fontData;
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-            context.fillText(text, canvas.width / 2, canvas.height / 2);
-            context.restore();
-        }
 
         this.initialize = function() {
             var canvas = document.getElementById("canvas");
@@ -45,6 +37,8 @@ class Engine {
             track = new Track();
             bg = new Background();
             palmtree = new Palmtree(context);
+
+            engine.addPalmTrees();
 
             animate(canvas, context);
         }
@@ -63,7 +57,11 @@ class Engine {
             track.drawTrack(context);
             car.draw(debug);
 
-            palmtree.draw(new Point(200, 350), 7);
+            //palmtree.draw(new Point(100, 100), 7);
+
+            for (var i = 0;i< palmTreePositions.length;i++) {
+                palmtree.draw(palmTreePositions[i]);
+            }
 
             if (!pause) {
                 if (counter <= 100) {
@@ -152,6 +150,29 @@ class Engine {
             }
         }
 
+        this.renderCountdown = function(context, fontData, text) {
+            context.save();
+            context.fillStyle = "#ffffff";
+            context.font = fontData;
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(text, canvas.width / 2, canvas.height / 2);
+            context.restore();
+        }
+
+        this.addPalmTrees = function() {
+            palmTreePositions.push(new Point(100, 100, engine.getRandomInt(3,7)));
+            palmTreePositions.push(new Point(520, 88, engine.getRandomInt(3,7)));
+        }
+
+        /**
+         * Returns a random integer between min (inclusive) and max (inclusive)
+         * Using Math.round() will give you a non-uniform distribution!
+         */
+        this.getRandomInt = function(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
         window.addEventListener('keydown', function (event) {
             console.log("down: " + event.keyCode);
             
@@ -188,7 +209,6 @@ class Engine {
             // M
             if(event.keyCode == 77) {
                 playMusic = !playMusic;
-                console.log("playMusic is " + playMusic);
             }
         }, false);
 
