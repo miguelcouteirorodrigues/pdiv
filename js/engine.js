@@ -162,7 +162,7 @@ class Engine {
 
         this.addPalmTrees = function() {
             palmTreePositions.push(new Point(100, 100, engine.getRandomInt(4,7)));
-            palmTreePositions.push(new Point(520, 88, engine.getRandomInt(4,7)));
+            palmTreePositions.push(new Point(518, 88, engine.getRandomInt(4,7)));
             palmTreePositions.push(new Point(130, 320, engine.getRandomInt(4,7)));
         }
 
