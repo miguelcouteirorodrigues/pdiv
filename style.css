@@ -1,3 +1,11 @@
+td {
+    width: 33%;
+}
+
+#debug_table_cell {
+    vertical-align: text-top;
+}
+
 canvas {
     padding: 0;
     margin: auto;

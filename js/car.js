@@ -15,30 +15,30 @@ class Car {
         this.bottomRight = new Point (this.carSize * 4 / this.axlePosition, (this.carSize / 2) * this._img.height / this._img.width, 0);
 
         this.center = new Point(this.carSize * -1 / this.axlePosition + this.carSize / 2, (this.carSize * this._img.height / this._img.width) / 2, 0);
+
+        this._carX = this.carSize * -1 / this.axlePosition;
+        this._carY = (this.carSize * -1 / 2) * (this._img.height / this._img.width);
     }
 
     draw(debug) {
-        var _carX = this.carSize * -1 / this.axlePosition;
-        var _carY = (this.carSize * -1 / 2) * this._img.height / this._img.width;
-
         this.ctx.save();
         this.ctx.translate(this.x, this.y);
         this.ctx.rotate(this.angle);
 
         if (debug) {
             this.ctx.moveTo(this.topLeft.x, this.topLeft.y);
+
+            this.ctx.strokeStyle = "#fc0ad8";
+            this.ctx.lineWidth = 2;
+
             this.ctx.beginPath();
-            this.ctx.fillStyle = "white";
-            this.ctx.strokeStyle = "#ffffffff";
-            //this.ctx.globalApha = 0;
             this.ctx.rect(this.topLeft.x, this.topLeft.y, this.carSize, this.carSize * this._img.height / this._img.width);
             this.ctx.stroke();
-            //this.ctx.fill();
-            //this.ctx.globalApha = 1;
             this.ctx.closePath();
         }
 
-        this.ctx.drawImage(this._img, _carX, _carY, this.carSize, this.carSize * this._img.height / this._img.width);
+        this.ctx.imageSmoothingEnabled = "true";
+        this.ctx.drawImage(this._img, this._carX, this._carY, this.carSize, this.carSize * this._img.height / this._img.width);
         this.ctx.restore();
     }
 }

@@ -18,14 +18,90 @@
         <audio id="audio_skid" src="./assets/skid.mp3" preload="auto" controls="none" style="display: none;"></audio>
         <audio id="audio_pause" src="./assets/pause.mp3" preload="auto" controls="none" style="display: none;"></audio>
         <h1>Racer! The Game</h1>
-        <div id="canvas-container">
-            <canvas id="canvas">
-                <p><code>canvas</code> not supported</p>
-            </canvas>
-            <script>
-                var engine = new Engine();
-                engine.initialize();
-            </script>
-        </div>
+        <table id="main_table">
+            <tr id="main_row">
+                <td></td>
+                <td>
+                    <canvas id="canvas">
+                        <p><code>canvas</code> not supported</p>
+                    </canvas>
+                </td>
+                <td id="debug_table_cell">
+                    <table id="debug_table">
+                        <tr>
+                            <td>Car data</td>
+                            <td/>
+                        </tr>
+                        <tr>
+                            <td>Top Left</td>
+                            <td>Top Right</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table id="top_left_table">
+                                    <tr>
+                                        <td>x:</td>
+                                        <td id="top_left_table_x"/>
+                                    </tr>
+                                    <tr>
+                                        <td>y:</td>
+                                        <td id="top_left_table_y"/>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table id="top_right_table">
+                                    <tr>
+                                        <td>x:</td>
+                                        <td id="top_right_table_x"/>
+                                    </tr>
+                                    <tr>
+                                        <td>x:</td>
+                                        <td id="top_right_table_y"/>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Bottom Left</td>
+                            <td>Bottom Right</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table id="bottom_left_table">
+                                    <tr>
+                                        <td>x:</td>
+                                        <td id="bottom_left_table_x"/>
+                                    </tr>
+                                    <tr>
+                                        <td>y:</td>
+                                        <td id="bottom_left_table_y"/>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table id="bottom_right_table">
+                                    <tr>
+                                        <td>x:</td>
+                                        <td id="bottom_right_table_x"/>
+                                    </tr>
+                                    <tr>
+                                        <td>x:</td>
+                                        <td id="bottom_right_table_y"/>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                    <table id="debug_data">
+
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <script>
+            var engine = new Engine();
+            engine.initialize();
+        </script>
     </body>
 </html>

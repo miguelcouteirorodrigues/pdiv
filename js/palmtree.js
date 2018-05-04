@@ -17,7 +17,7 @@ class Palmtree {
      * @param {Point} center the center point of the palmtree 
      * @param {number} leaves the number of leaves on the palmtree
      */
-    draw(center) {
+    draw(center, debug) {
         var leaves = center.angle;
         var angle = 360 / leaves;
         
@@ -39,6 +39,10 @@ class Palmtree {
         }
 
         this.drawCenter();
+
+        if (debug) {
+            this.drawDebugSymbols();
+        }
 
         this.ctx.restore();
     }
@@ -85,5 +89,20 @@ class Palmtree {
         this.ctx.fill();
 
         this.ctx.closePath();
+    }
+
+    drawDebugSymbols() {
+        this.ctx.moveTo(-1 * this.radius / 2, -1 * this.radius / 2);
+
+        this.ctx.strokeStyle = "#fc0ad8";
+        this.ctx.lineWidth = 2;
+
+        this.ctx.beginPath();
+        this.ctx.lineTo(this.radius / 2, -1 * this.radius / 2);
+        this.ctx.lineTo(this.radius / 2, this.radius / 2);
+        this.ctx.lineTo(-1 * this.radius / 2, this.radius / 2);
+        this.ctx.lineTo(-1 * this.radius / 2, -1 * this.radius / 2);
+        this.ctx.closePath();
+        this.ctx.stroke();
     }
 }

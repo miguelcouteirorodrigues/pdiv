@@ -1,12 +1,14 @@
 class Engine {
     constructor () {
-        var x = 220;
+        var debugTable;       
+        var x;
         var y;
         var angle = 0;
         var counter = 0;
         var moveOnX = true;
         var moveOnY = true;
         var debug = false;
+        var carAnalytics = true;
         var pause = false;
         var startMusic = true;
         var playMusic = true;
@@ -24,10 +26,14 @@ class Engine {
         var skidLeft;
         var skidRight;
 
+        var imgData;
+
         this.initialize = function() {
             var canvas = document.getElementById("canvas");
+            debugTable = document.getElementById("debug_table");
             canvas.width = 606;
             canvas.height = 453;
+            x = 220;
             y = canvas.height / 8;
             var context = canvas.getContext('2d');
 
@@ -44,24 +50,31 @@ class Engine {
         }
 
         var animate = function(canvas, context) {
+            if (debug) {
+                debugTable.style.display = "block";
+            }
+            else {
+                debugTable.style.display = "none";
+            }
+            
             context.clearRect(0, 0, innerWidth, innerHeight);
             context.beginPath();
 
             car = new Car(context, x, y, angle);
 
+            //render just the track and get the pixel data for the rotation point of the car
             track.drawTrack(context);
-            var imgData = context.getImageData(x, y, 1, 1);
+            imgData = context.getImageData(x, y, 1, 1);
 
+            //clear the canvas and redraw elements in order: background, track, car, palmtrees
             context.clearRect(0, 0, context.canvas.width, context.canvas.height);
             bg.drawBackground(context);
             track.drawTrack(context);
             car.draw(debug);
 
-            //palmtree.draw(new Point(100, 100), 7);
-
             for (var i = 0;i< palmTreePositions.length;i++) {
-                palmtree.draw(palmTreePositions[i]);
-            }
+                palmtree.draw(palmTreePositions[i], debug);
+            }            
 
             if (!pause) {
                 if (counter <= 100) {
@@ -73,9 +86,6 @@ class Engine {
                 else if (counter <= 300) {
                     engine.renderCountdown(context, '96pt Arial', '1');
                 }
-                else if (counter <= 200) {
-                    engine.renderCountdown(context, '96pt Arial', '1');
-                }
                 else {
                     if(playMusic) {
                         bgMusic.play();
@@ -84,52 +94,9 @@ class Engine {
                         bgMusic.pause();
                     }
                     
-                    if (x + Math.cos(angle) + car.topRight.x >= context.canvas.width || x + Math.cos(angle) + car.bottomRight.x >= context.canvas.width || x + Math.cos(angle) - car.topRight.x <= 0 || x + Math.cos(angle) - car.bottomRight.x <= 0)
-                    {
-                        moveOnX = false;
-                    }
-                    else {
-                        moveOnX = true;
-                    }
-
-                    if (y + Math.sin(angle) + car.topRight.x >= context.canvas.height || y + Math.sin(angle) + car.bottomRight.x >= context.canvas.height || y + Math.sin(angle) - car.topRight.x <= 0 || y + Math.sin(angle) - car.bottomRight.x <= 0)
-                    {
-                        moveOnY = false;
-                    }
-                    else {
-                        moveOnY = true;
-                    }
+                    engine.checkCollision(context);
                     
-                    if (imgData.data[3] == 0) {
-                        if (moveOnX) {
-                            x += Math.cos(angle) / 2;
-                        }
-                        else {
-                            x -= Math.cos(angle) / 2;
-                        }
-
-                        if (moveOnY) {
-                            y += Math.sin(angle) / 2;
-                        }
-                        else {
-                            y -= Math.sin(angle) / 2;
-                        }
-                    }
-                    else {
-                        if (moveOnX) {
-                            x += Math.cos(angle);
-                        }
-                        else {
-                            x -= Math.cos(angle);
-                        }
-
-                        if (moveOnY) {
-                            y += Math.sin(angle);
-                        }
-                        else {
-                            y -= Math.sin(angle);
-                        }
-                    }
+                    engine.checkTerrain();
                 }
             }
             else {
@@ -160,9 +127,104 @@ class Engine {
             context.restore();
         }
 
+        /**
+         * Prevents the car from moving ouside the edges of the canvas.
+         */
+        this.checkCollision = function(context) {
+            var _topLeft = new Point(Math.round(x + car.topLeft.x * Math.cos(angle - Math.atan(car.topLeft.y / car.topLeft.x))), 
+            Math.round(y + car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+
+            var _topRight = new Point(Math.round(x + car.topRight.x * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))),
+            Math.round(y + car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+
+            var _bottomLeft = new Point(Math.round(x + car.bottomLeft.x * Math.cos(angle - Math.atan(car.bottomLeft.y / car.bottomLeft.x))),
+            Math.round(y - car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+
+            var _bottomRight = new Point(Math.round(x + car.bottomRight.x * Math.cos(angle + Math.atan(car.bottomRight.y / car.bottomRight.x))),
+            Math.round(y - car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+            
+            if (carAnalytics) {
+                var _td_topleft_x = document.getElementById("top_left_table_x");
+                _td_topleft_x.innerText = _topLeft.x;
+                var _td_topleft_y = document.getElementById("top_left_table_y");
+                _td_topleft_y.innerText = _topLeft.y;
+
+                var _td_topright_x = document.getElementById("top_right_table_x");
+                _td_topright_x.innerText = _topRight.x;
+                var _td_topright_y = document.getElementById("top_right_table_y");
+                _td_topright_y.innerText = _topRight.y;
+
+                var _td_bottomleft_x = document.getElementById("bottom_left_table_x");
+                _td_bottomleft_x.innerText = _bottomLeft.x;
+                var _td_bottomleft_y = document.getElementById("bottom_left_table_y");
+                _td_bottomleft_y.innerText = _bottomLeft.y;
+
+                var _td_bottomright_x = document.getElementById("bottom_right_table_x");
+                _td_bottomright_x.innerText = _bottomRight.x;
+                var _td_bottomright_y = document.getElementById("bottom_right_table_y");
+                _td_bottomright_y.innerText = _bottomRight.y;
+            }
+
+            //canvas edge collision
+            if (_topRight.x >= context.canvas.width || _bottomRight.x >= context.canvas.width || _topRight.x <= 0 || _bottomRight.x <= 0) {
+                moveOnX = false;
+            }
+            else {
+                moveOnX = true;
+            }
+
+            //canvas edge collision
+            if (y + Math.sin(angle) + car.topRight.y >= context.canvas.height
+            || y + Math.sin(angle) + car.bottomRight.y >= context.canvas.height
+            || y - Math.sin(angle) - car.topRight.y <= 0
+            || y - Math.sin(angle) - car.bottomRight.y <= 0) {
+                moveOnY = false;
+            }
+            else {
+                moveOnY = true;
+            }
+        }
+
+        /**
+         * Checks if the rotation point of the car is on a transparent pixel.
+         * If it is, reduces the movement speed
+         */
+        this.checkTerrain = function() {
+            if (imgData.data[3] == 0) {
+                if (moveOnX) {
+                    x += Math.cos(angle) / 2;
+                }
+                else {
+                    x -= Math.cos(angle) / 2;
+                }
+
+                if (moveOnY) {
+                    y += Math.sin(angle) / 2;
+                }
+                else {
+                    y -= Math.sin(angle) / 2;
+                }
+            }
+            else {
+                if (moveOnX) {
+                    x += Math.cos(angle);
+                }
+                else {
+                    x -= Math.cos(angle);
+                }
+
+                if (moveOnY) {
+                    y += Math.sin(angle);
+                }
+                else {
+                    y -= Math.sin(angle);
+                }
+            }
+        }
+
         this.addPalmTrees = function() {
             palmTreePositions.push(new Point(100, 100, engine.getRandomInt(4,7)));
-            palmTreePositions.push(new Point(518, 88, engine.getRandomInt(4,7)));
+            palmTreePositions.push(new Point(515, 88, engine.getRandomInt(4,7)));
             palmTreePositions.push(new Point(130, 320, engine.getRandomInt(4,7)));
         }
 
@@ -182,7 +244,13 @@ class Engine {
                 if (!pause) {
                     skidLeft = new sound("skid");
                     skidLeft.play();
-                    angle -= Math.PI / 16;
+
+                    if (imgData.data[3] == 0) {
+                        angle -= Math.PI / 64;
+                    }
+                    else {
+                        angle -= Math.PI / 32;
+                    }
                 }
             }
 
@@ -191,7 +259,13 @@ class Engine {
                 if (!pause) {
                     skidRight = new sound("skid");
                     skidRight.play();
-                    angle += Math.PI / 16;
+
+                    if (imgData.data[3] == 0) {
+                        angle += Math.PI / 64;
+                    }
+                    else {
+                        angle += Math.PI / 32;
+                    }
                 }
             }
 
@@ -199,6 +273,11 @@ class Engine {
             if (event.keyCode == 49) {
                 debug = !debug;
                 console.log("debug is " + debug);
+            }
+
+            // 2
+            if (event.keyCode == 50) {
+                carAnalytics = !carAnalytics;
             }
 
             // P

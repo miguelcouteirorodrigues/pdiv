@@ -4,7 +4,8 @@ class Track {
         this.points = [];
         this.lastPoint;
         this._img = new Image();
-        this._img.src = "assets/track.png";
+        this._img.src = "./assets/track.png";
+        //this._img.crossOrigin = "localhost";
     }
 
     drawTrack(ctx) {
@@ -13,6 +14,7 @@ class Track {
         
         ctx.save();
         //this.traceLine(ctx);
+        ctx.imageSmoothingEnabled = "true";
         ctx.drawImage(this._img, 0, 0, this._img.width * _scaleX, this._img.height * _scaleY);
         ctx.restore();
     }
