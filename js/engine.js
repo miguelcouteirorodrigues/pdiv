@@ -132,16 +132,16 @@ class Engine {
          */
         this.checkCollision = function(context) {
             var _topLeft = new Point(Math.round(x + car.topLeft.x * Math.cos(angle - Math.atan(car.topLeft.y / car.topLeft.x))), 
-            Math.round(y + car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+            Math.round(y + car.topLeft.y * Math.sin(Math.PI / 2 + (angle - Math.atan(car.topLeft.y / car.topLeft.x)))), 0);
 
             var _topRight = new Point(Math.round(x + car.topRight.x * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))),
-            Math.round(y + car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+            Math.round(y + car.topRight.y * Math.sin(Math.PI / 2 - (angle - Math.atan(car.topRight.y / car.topRight.x)))), 0);
 
             var _bottomLeft = new Point(Math.round(x + car.bottomLeft.x * Math.cos(angle - Math.atan(car.bottomLeft.y / car.bottomLeft.x))),
-            Math.round(y - car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+            0, 0);
 
             var _bottomRight = new Point(Math.round(x + car.bottomRight.x * Math.cos(angle + Math.atan(car.bottomRight.y / car.bottomRight.x))),
-            Math.round(y - car.topRight.y * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))), 0);
+            0, 0);
             
             if (carAnalytics) {
                 var _td_topleft_x = document.getElementById("top_left_table_x");
