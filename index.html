@@ -12,16 +12,41 @@
         <script src="js/background.js"></script>
         <script src="js/sound.js"></script>
         <script src="js/palmtree.js"></script>
+        <script src="js/checkpoint.js"></script>
     </head>
     <body id="body">
         <audio id="audio_background" src="./assets/theme.mp3" preload="auto" controls="none" style="display: none;" loop=""></audio>
         <audio id="audio_skid" src="./assets/skid.mp3" preload="auto" controls="none" style="display: none;"></audio>
         <audio id="audio_pause" src="./assets/pause.mp3" preload="auto" controls="none" style="display: none;"></audio>
-        <h1>Racer! The Game</h1>
-        <table id="main_table">
+        <h1 class="title">Racer! The Game</h1>
+        <table id="main_table" class="main_table">
             <tr id="main_row">
-                <td></td>
-                <td>
+                <td class="instructions">
+                    <table>
+                        <tr>
+                            <td colspan="2"><h1>Instruções</h1></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">O objetivo do jogo é dar uma volta completa à pista no menor tempo possível. Tenta bater o recorde!</td>
+                        </tr>
+                        <tr class="controls_top_row">
+                            <td>Controlos</td>
+                        </tr>
+                        <tr>
+                            <td>Virar</td>
+                            <td>&larr; &rarr;</td>
+                        </tr>
+                        <tr>
+                            <td>Pausar</td>
+                            <td>P</td>
+                        </tr>
+                        <tr>
+                            <td>Silenciar a música</td>
+                            <td>M</td>
+                        </tr>
+                    </table>
+                </td>
+                <td id="canvas_td">
                     <canvas id="canvas">
                         <p><code>canvas</code> not supported</p>
                     </canvas>
@@ -38,7 +63,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <table id="top_left_table">
+                                <table>
                                     <tr>
                                         <td>x:</td>
                                         <td id="top_left_table_x"/>
@@ -50,7 +75,7 @@
                                 </table>
                             </td>
                             <td>
-                                <table id="top_right_table">
+                                <table>
                                     <tr>
                                         <td>x:</td>
                                         <td id="top_right_table_x"/>
@@ -92,9 +117,32 @@
                                 </table>
                             </td>
                         </tr>
-                    </table>
-                    <table id="debug_data">
-
+                        <tr>
+                            <td>
+                                Car rotation point
+                            </td>
+                            <td/>
+                        </tr>
+                        <tr>
+                            <td>x:</td>
+                            <td id="canvas_translate_x"/>
+                        </tr>
+                        <tr>
+                            <td>y:</td>
+                            <td id="canvas_translate_y"/>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="collisions"/>
+                            </td>
+                            <td>Colisões</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="checkpoints"/>
+                            </td>
+                            <td>Pontos de controlo</td>
+                        </tr>
                     </table>
                 </td>
             </tr>

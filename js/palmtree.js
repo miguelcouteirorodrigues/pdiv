@@ -12,11 +12,6 @@ class Palmtree {
         this.controlPoint4 = new Point(this.leaveWidth * -1, this.radius * -1);
     }
 
-    /**
-     * Creates a palmtree with the specified number of leaves on top
-     * @param {Point} center the center point of the palmtree 
-     * @param {number} leaves the number of leaves on the palmtree
-     */
     draw(center, debug) {
         var leaves = center.angle;
         var angle = 360 / leaves;

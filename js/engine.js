@@ -8,12 +8,12 @@ class Engine {
         var moveOnX = true;
         var moveOnY = true;
         var debug = false;
-        var carAnalytics = true;
         var pause = false;
         var startMusic = true;
         var playMusic = true;
 
         var palmTreePositions = [];
+        var checkpointPositions = [];
         
         var bgMusic;
         var pauseMusic;
@@ -30,11 +30,12 @@ class Engine {
 
         this.initialize = function() {
             var canvas = document.getElementById("canvas");
+            canvas.focus();
             debugTable = document.getElementById("debug_table");
             canvas.width = 606;
             canvas.height = 453;
             x = 220;
-            y = canvas.height / 8;
+            y = Math.floor(canvas.height / 8);
             var context = canvas.getContext('2d');
 
             bgMusic = new sound("background");
@@ -45,16 +46,17 @@ class Engine {
             palmtree = new Palmtree(context);
 
             engine.addPalmTrees();
+            engine.addCheckpoints();
 
             animate(canvas, context);
         }
 
         var animate = function(canvas, context) {
             if (debug) {
-                debugTable.style.display = "block";
+                debugTable.style.visibility = "visible";
             }
             else {
-                debugTable.style.display = "none";
+                debugTable.style.visibility = "hidden";
             }
             
             context.clearRect(0, 0, innerWidth, innerHeight);
@@ -72,9 +74,14 @@ class Engine {
             track.drawTrack(context);
             car.draw(debug);
 
-            for (var i = 0;i< palmTreePositions.length;i++) {
+            for (var i = 0; i < palmTreePositions.length; i++) {
                 palmtree.draw(palmTreePositions[i], debug);
-            }            
+            }
+
+            for (var i = 0; i < checkpointPositions.length; i++) {
+                var checkpoint = new Checkpoint(context, checkpointPositions[i][0], checkpointPositions[i][1]);
+                checkpoint.draw(debug);
+            }
 
             if (!pause) {
                 if (counter <= 100) {
@@ -109,9 +116,6 @@ class Engine {
                 animate(canvas, context);
             });
 
-            if (debug) {
-                console.log("counter: " + counter + "; x: " + x + "; y: " + y);
-            }
             if (!pause) {
                 counter++;
             }
@@ -131,19 +135,17 @@ class Engine {
          * Prevents the car from moving ouside the edges of the canvas.
          */
         this.checkCollision = function(context) {
-            var _topLeft = new Point(Math.round(x + car.topLeft.x * Math.cos(angle - Math.atan(car.topLeft.y / car.topLeft.x))), 
-            Math.round(y + car.topLeft.y * Math.sin(Math.PI / 2 + (angle - Math.atan(car.topLeft.y / car.topLeft.x)))), 0);
-
-            var _topRight = new Point(Math.round(x + car.topRight.x * Math.cos(angle + Math.atan(car.topRight.y / car.topRight.x))),
-            Math.round(y + car.topRight.y * Math.sin(Math.PI / 2 - (angle - Math.atan(car.topRight.y / car.topRight.x)))), 0);
-
-            var _bottomLeft = new Point(Math.round(x + car.bottomLeft.x * Math.cos(angle - Math.atan(car.bottomLeft.y / car.bottomLeft.x))),
-            0, 0);
-
-            var _bottomRight = new Point(Math.round(x + car.bottomRight.x * Math.cos(angle + Math.atan(car.bottomRight.y / car.bottomRight.x))),
-            0, 0);
+            var currentCenter = new Point(x, y, angle);
             
-            if (carAnalytics) {
+            var _topLeft = engine.rotatePoint(currentCenter, car.topLeft);
+
+            var _topRight = engine.rotatePoint(currentCenter, car.topRight);
+
+            var _bottomLeft = engine.rotatePoint(currentCenter, car.bottomLeft);
+
+            var _bottomRight = engine.rotatePoint(currentCenter, car.bottomRight);
+            
+            if (debug) {
                 var _td_topleft_x = document.getElementById("top_left_table_x");
                 _td_topleft_x.innerText = _topLeft.x;
                 var _td_topleft_y = document.getElementById("top_left_table_y");
@@ -163,6 +165,11 @@ class Engine {
                 _td_bottomright_x.innerText = _bottomRight.x;
                 var _td_bottomright_y = document.getElementById("bottom_right_table_y");
                 _td_bottomright_y.innerText = _bottomRight.y;
+
+                var _td_translate_x = document.getElementById("canvas_translate_x");
+                _td_translate_x.innerText = Math.round(x);
+                var _td_translate_y = document.getElementById("canvas_translate_y");
+                _td_translate_y.innerText = Math.round(y);
             }
 
             //canvas edge collision
@@ -174,10 +181,7 @@ class Engine {
             }
 
             //canvas edge collision
-            if (y + Math.sin(angle) + car.topRight.y >= context.canvas.height
-            || y + Math.sin(angle) + car.bottomRight.y >= context.canvas.height
-            || y - Math.sin(angle) - car.topRight.y <= 0
-            || y - Math.sin(angle) - car.bottomRight.y <= 0) {
+            if (_topRight.y >= context.canvas.height || _bottomRight.y >= context.canvas.height || _topRight.y <= 0 || _bottomRight.y <= 0) {
                 moveOnY = false;
             }
             else {
@@ -228,6 +232,11 @@ class Engine {
             palmTreePositions.push(new Point(130, 320, engine.getRandomInt(4,7)));
         }
 
+        this.addCheckpoints = function() {
+            checkpointPositions.push([new Point(286, 0, 0), new Point(286, 80, 0)]);
+            checkpointPositions.push([new Point(525, 88, 0), new Point(605, 88, 0)]);
+        }
+
         /**
          * Returns a random integer between min (inclusive) and max (inclusive)
          * Using Math.round() will give you a non-uniform distribution!
@@ -235,6 +244,23 @@ class Engine {
         this.getRandomInt = function(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
+
+        /**
+         * Returns a point rotated by the angle
+         * @param {Point} pivot current xy position and angle 
+         * @param {Point} point the point to rotate
+         */
+        this.rotatePoint = function(pivot, point) {
+            // Rotate clockwise, angle in radians
+            var x = Math.round((Math.cos(pivot.angle) * point.x) -
+                                (Math.sin(pivot.angle) * point.y) +
+                                pivot.x),
+                y = Math.round((Math.sin(pivot.angle) * point.x) +
+                                (Math.cos(pivot.angle) * point.y) +
+                                pivot.y);
+            //return [x, y];
+            return new Point(x, y, pivot.angle);
+        };
 
         window.addEventListener('keydown', function (event) {
             console.log("down: " + event.keyCode);
