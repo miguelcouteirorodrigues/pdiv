@@ -13,6 +13,7 @@
         <script src="js/sound.js"></script>
         <script src="js/palmtree.js"></script>
         <script src="js/checkpoint.js"></script>
+        <script src="js/hud.js"></script>
     </head>
     <body id="body">
         <audio id="audio_background" src="./assets/theme.mp3" preload="auto" controls="none" style="display: none;" loop=""></audio>
@@ -30,7 +31,7 @@
                             <td colspan="2">O objetivo do jogo é dar uma volta completa à pista no menor tempo possível. Tenta bater o recorde!</td>
                         </tr>
                         <tr class="controls_top_row">
-                            <td>Controlos</td>
+                            <td colspan="2"><h2>Controlos</h2></td>
                         </tr>
                         <tr>
                             <td>Virar</td>
@@ -164,6 +165,7 @@
                                     </tr>
                                 </table>
                             </td>
+                            <td id="uncrossed_checkpoints_td"/>
                         </tr>
                         <tr>
                             <td>
@@ -176,6 +178,11 @@
                                     </tr>
                                 </table>
                             </td>
+                            <td id="crossed_checkpoints_td"/>
+                        </tr>
+                        <tr>
+                            <td>Counter</td>
+                            <td id="counter_td"/>
                         </tr>
                     </table>
                 </td>

@@ -4,7 +4,7 @@ class Engine {
         var x;
         var y;
         var angle = 0;
-        var counter = 0;
+        var counter = -300;
         var moveOnX = true;
         var moveOnY = true;
         var debug = false;
@@ -22,6 +22,7 @@ class Engine {
         var bg;
         var car;
         var palmtree;
+        var hud;
 
         var skidLeft;
         var skidRight;
@@ -44,6 +45,7 @@ class Engine {
             track = new Track();
             bg = new Background();
             palmtree = new Palmtree(context);
+            hud = new HUD(0);
 
             engine.addPalmTrees();
             engine.addCheckpoints();
@@ -54,6 +56,8 @@ class Engine {
         var animate = function(canvas, context) {
             if (debug) {
                 debugTable.style.visibility = "visible";
+                var counter_td = document.getElementById("counter_td");
+                counter_td.innerText = counter;
             }
             else {
                 debugTable.style.visibility = "hidden";
@@ -69,7 +73,7 @@ class Engine {
             imgData = context.getImageData(x, y, 1, 1);
 
             //clear the canvas and redraw elements in order: background, track, car, palmtrees
-            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+            //context.clearRect(0, 0, context.canvas.width, context.canvas.height);
             bg.drawBackground(context);
             track.drawTrack(context);
             car.draw(debug);
@@ -83,31 +87,30 @@ class Engine {
                 checkpoint.draw(debug);
             }
 
-            if (!pause) {
-                if (counter <= 100) {
-                    engine.renderCountdown(context, '48pt Arial', '3');
-                }
-                else if (counter <= 200) {
-                    engine.renderCountdown(context, '72pt Arial', '2');
-                }
-                else if (counter <= 300) {
-                    engine.renderCountdown(context, '96pt Arial', '1');
+            if (counter <= 0) {
+                engine.getCountdown(context);
+                hud.drawEmpty(context);
+            }
+            else {
+                if(playMusic) {
+                    bgMusic.play();
                 }
                 else {
-                    if(playMusic) {
-                        bgMusic.play();
-                    }
-                    else {
-                        bgMusic.pause();
-                    }
-                    
+                    bgMusic.pause();
+                }
+
+                hud.draw(context, counter);
+
+                if (!pause) {
                     engine.checkCollision(context);
-                    
                     engine.checkTerrain();
                 }
             }
-            else {
+
+            if(pause) {
                 bgMusic.pause();
+
+                engine.drawPauseIcon(context);
             }
 
             context.closePath();
@@ -121,13 +124,31 @@ class Engine {
             }
         }
 
-        this.renderCountdown = function(context, fontData, text) {
+        this.getCountdown = function(context) {
+            if (counter <= -200) {
+                engine.renderCountdown(context, '72pt Arial', '3', '#ff0000');
+                hud.drawEmpty(context);
+            }
+            else if (counter <= -100) {
+                engine.renderCountdown(context, '96pt Arial', '2', '#ffff00');
+                hud.drawEmpty(context);
+            }
+            else if (counter <= 0) {
+                engine.renderCountdown(context, '110pt Arial', '1', '#00ff00');
+                hud.drawEmpty(context);
+            }
+        }
+
+        this.renderCountdown = function(context, fontData, text, color) {
             context.save();
-            context.fillStyle = "#ffffff";
             context.font = fontData;
+            context.fillStyle = color;
             context.textAlign = 'center';
             context.textBaseline = 'middle';
             context.fillText(text, canvas.width / 2, canvas.height / 2);
+            context.strokeStyle = "#666666";
+            context.lineWidth = 3;
+            context.strokeText(text, canvas.width / 2, canvas.height / 2);
             context.restore();
         }
 
@@ -196,6 +217,46 @@ class Engine {
                     moveOnY = false;
                 }
             }
+
+            //checkpoints
+            var _crossed_checkpoints = 0;
+            var _crossed_checkpoints_td = document.getElementById("crossed_checkpoints_td");
+            var _uncrossed_checkpoints = 0;
+            var _uncrossed_checkpoints_td = document.getElementById("uncrossed_checkpoints_td");
+
+            for (var i = 0; i < checkpointPositions.length; i++) {
+                if (i == 0 && checkpointPositions[i][2] == false || (i > 0 && checkpointPositions[i - 1][2] == true)) {
+                    if (engine.PointIntersect(checkpointPositions[i][0], _topLeft, checkpointPositions[i][1], _bottomLeft)) {
+                        checkpointPositions[i][2] = true;
+                    }
+                }
+
+                if (checkpointPositions[i][2] == false) {
+                    _uncrossed_checkpoints += 1;
+                }
+                else {
+                    _crossed_checkpoints += 1;
+                }
+            }
+
+            _crossed_checkpoints_td.innerText = _crossed_checkpoints;
+            _uncrossed_checkpoints_td.innerText = _uncrossed_checkpoints;
+
+            //all checkpoints crossed, resets
+            if (checkpointPositions[checkpointPositions.length - 1][2] == true) {
+                for (var i = 0; i < checkpointPositions.length; i++) {
+                    checkpointPositions[i][2] = false;
+                }
+
+                _crossed_checkpoints = 0;
+                _uncrossed_checkpoints = checkpointPositions.length;
+
+                if (hud.bestTime == undefined || (hud.bestTime > counter)) {
+                    hud.bestTime = counter;
+                }
+
+                counter = 0;
+            }
         }
 
         /**
@@ -242,10 +303,32 @@ class Engine {
         }
 
         this.addCheckpoints = function() {
-            checkpointPositions.push([new Point(286, 0, 0), new Point(286, 80, 0), false]);
             checkpointPositions.push([new Point(525, 88, 0), new Point(605, 88, 0), false]);
+            checkpointPositions.push([new Point(125, 125, 0), new Point(185, 185, 0), false]);
+            checkpointPositions.push([new Point(125, 245, 0), new Point(185, 185, 0), false]);
+            checkpointPositions.push([new Point(510, 280, 0), new Point(580, 220, 0), false]);
+            checkpointPositions.push([new Point(515, 375, 0), new Point(580, 420, 0), false]);
+            checkpointPositions.push([new Point(85, 375, 0), new Point(25, 420, 0), false]);
+            checkpointPositions.push([new Point(25, 30, 0), new Point(85, 80, 0), false]);
+
+            //finish line; MUST BE LAST
+            checkpointPositions.push([new Point(286, 0, 0), new Point(286, 80, 0), false]);
         }
 
+        this.drawPauseIcon = function(ctx) {
+            ctx.beginPath()
+            ctx.fillStyle = "#44444499";
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            
+            ctx.fillStyle = "#ffffffff";
+            ctx.fillRect(ctx.canvas.width / 2 - 30, ctx.canvas.height / 2 - 40, 20, 80);
+            ctx.fillRect(ctx.canvas.width / 2 + 10, ctx.canvas.height / 2 - 40, 20, 80);
+
+            ctx.strokeStyle = "#000000ff";
+            ctx.strokeRect(ctx.canvas.width / 2 - 30, ctx.canvas.height / 2 - 40, 20, 80);
+            ctx.strokeRect(ctx.canvas.width / 2 + 10, ctx.canvas.height / 2 - 40, 20, 80);
+            ctx.closePath();
+        }
         /**
          * Returns a random integer between min (inclusive) and max (inclusive)
          * Using Math.round() will give you a non-uniform distribution!
@@ -293,7 +376,7 @@ class Engine {
         }
 
         window.addEventListener('keydown', function (event) {
-            console.log("down: " + event.keyCode);
+            //console.log("down: " + event.keyCode);
             
             // left
             if (event.keyCode == 37) {
@@ -328,7 +411,6 @@ class Engine {
             // 1
             if (event.keyCode == 49) {
                 debug = !debug;
-                console.log("debug is " + debug);
             }
 
             // 2
@@ -349,7 +431,7 @@ class Engine {
         }, false);
 
         window.addEventListener('keyup', function (event) {
-            console.log("up: " + event.keyCode);
+            //console.log("up: " + event.keyCode);
             if (event.keyCode == 37) {
                 skidLeft.stop("skid");
             }
