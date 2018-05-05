@@ -1,8 +1,9 @@
 class Checkpoint {
-    constructor (ctx, startPoint, endPoint) {
+    constructor (ctx, startPoint, endPoint, crossed) {
         this.ctx = ctx;
         this.startPoint = startPoint;
         this.endPoint = endPoint;
+        this.crossed = crossed;
     }
 
     draw(debug) {
@@ -13,7 +14,14 @@ class Checkpoint {
             this.ctx.globalAlpha = 0;
         }
 
-        this.ctx.strokeStyle = "#19c9ff";
+        if (this.crossed) {
+            this.ctx.strokeStyle = "#16f207";
+        }
+        else {
+            this.ctx.strokeStyle = "#ff0000";
+        }
+
+        //this.ctx.strokeStyle = "#19c9ff";
         this.ctx.lineWidth = 10;
 
         this.ctx.beginPath();

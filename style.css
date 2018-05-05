@@ -38,8 +38,14 @@ canvas {
     height: 10px;
 }
 
-.checkpoints {
-    background-color: #19c9ff;
+.checkpoints_uncrossed {
+    background-color: #ff0000;
+    width: 10px;
+    height: 10px;
+}
+
+.checkpoints_crossed {
+    background-color: #16f207;
     width: 10px;
     height: 10px;
 }
