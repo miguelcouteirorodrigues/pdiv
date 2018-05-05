@@ -76,13 +76,9 @@ class HUD {
         ctx.strokeStyle = "#000000";
         ctx.fillStyle = "#ffffff";
         ctx.lineWidth = 1;
-        /* ctx.fillText(best, 420, 322);
-        ctx.fillText(current, 420, 350); */
         ctx.fillText("Melhor: " + best, 348, 322);
         ctx.fillText("Atual: " + current, 364, 350);
         ctx.stroke();
         ctx.closePath();
     }
-
-    
  }

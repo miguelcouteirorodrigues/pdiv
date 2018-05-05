@@ -43,9 +43,6 @@ class Palmtree {
     }
 
     drawLeave() {
-        //this.ctx.moveTo(this.startPoint.x, this.startPoint.y);
-        
-
         this.ctx.beginPath();
         this.ctx.moveTo(0, 0);
 

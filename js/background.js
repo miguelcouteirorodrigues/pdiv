@@ -1,6 +1,6 @@
 class Background {
     drawBackground(ctx) {
-        ctx.fillStyle = "#632607";
+        ctx.fillStyle = "#c6b27b";
         ctx.fillRect(0,0, ctx.canvas.width, ctx.canvas.height);
     }
 }

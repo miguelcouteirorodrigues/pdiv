@@ -21,7 +21,6 @@ class Checkpoint {
             this.ctx.strokeStyle = "#ff0000";
         }
 
-        //this.ctx.strokeStyle = "#19c9ff";
         this.ctx.lineWidth = 10;
 
         this.ctx.beginPath();
