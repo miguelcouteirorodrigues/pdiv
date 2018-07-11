@@ -66,14 +66,13 @@ class Engine {
             context.clearRect(0, 0, innerWidth, innerHeight);
             context.beginPath();
 
-            car = new Car(context, x, y, angle);
-
             //render just the track and get the pixel data for the rotation point of the car
             track.drawTrack(context);
             imgData = context.getImageData(x, y, 1, 1);
 
             bg.drawBackground(context);
             track.drawTrack(context);
+            car = new Car(context, x, y, angle);
             car.draw(debug);
 
             for (var i = 0; i < palmTreePositions.length; i++) {
